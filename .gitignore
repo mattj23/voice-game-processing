@@ -1,0 +1,4 @@
+Data/
+manifold_cache/
+manifold_binaries/
+*.pyc
