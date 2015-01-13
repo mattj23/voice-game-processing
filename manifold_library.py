@@ -16,12 +16,52 @@ import zipfile
 import zlib
 import hashlib
 import math
+import time 
 
 MODULE_PATH = os.path.dirname(__file__)
 BINARY_FOLDER = os.path.join(MODULE_PATH, "manifold_binaries")
 CACHE_FOLDER  = os.path.join(MODULE_PATH, "manifold_cache")
 
 class SolutionManifold:
+    """ The SolutionManifold class exists to perform live computations of the
+    closest approach given a settings file and a series of angles and stretches.
+    The class operates by spawning a background instance of ComputeSolution.exe
+    and communicating with it through the standard in and standard out pipes.
+    When finished, the process is closed with a termination command. """
+    process = None
+
+    def __init__(self, settingsObject):
+        """ Create an isntance of the ComputeManifold class, using a settings
+        dictionary object to give the ComputeSolution.exe process the parameters
+        of the simulation. """
+
+        # Find the executable and create a process
+        # The manifold was not cached and must be generated.
+        currentDirectory = os.getcwd()
+
+        os.chdir(BINARY_FOLDER)
+        if os.path.exists("settings.json"):
+            os.remove("settings.json")
+
+        with open("settings.json", "w") as handle:
+            handle.write(json.dumps(settingsObject, indent=4))
+        self.process = subprocess.Popen("ComputeSolution.exe", stdin=subprocess.PIPE, stdout=subprocess.PIPE, bufsize=256)
+        os.chdir(currentDirectory)
+
+    def get_closest_approach(self, angle, stretch):
+        """ Feed the angle and stretch to the embedded simulation process and
+        return the results. """
+        self.process.stdin.write("{},{}\n".format(angle, stretch))
+        self.process.stdin.flush()
+        self.process.stdout.flush()
+        result = self.process.stdout.readline()
+        return float(result)
+
+    def close_process(self):
+        self.process.stdin.write("end\n")
+
+
+class SolutionManifold_obselete:
     """ The SolutionManifold class exists to speed up interpolation lookups on a
     solution manifold. """
     data = {}
@@ -216,13 +256,7 @@ def load_cached_manifold(token):
     if not os.path.exists(filepath):
         return False
 
-    with open(filepath) as handle:
-        reduced = json.loads(handle.read())
-        #reduced = json.loads(zlib.decompress(handle.read()))
-    manifold = {}
-    for element in reduced:
-        key = (element['angle'], element['stretch'])
-        manifold[key] = element
+    manifold = load_solution_manifold(filepath)
     return manifold 
 
 def save_cached_manifold(token, manifold):
@@ -232,14 +266,13 @@ def save_cached_manifold(token, manifold):
 
     outputPath = os.path.join(CACHE_FOLDER, "{}.mfld".format(token))
 
-    # We must reduce the manifold to a list because JSON cannot store keys which
-    # are not strings.  We will rebuild the dictionary index when we load the
-    # manifold.
-    reduced = [v for k, v in manifold.items()]
-    # data = zlib.compress(json.dumps(reduced), 9)
-    data = json.dumps(reduced)
+    output = []
+    for k, v in manifold.items():
+        output.append("{angle},{stretch},{cpa},{outcome}".format(**v))
+    outputString = "\n".join(output)
+
     with open(outputPath, "w") as handle:
-        handle.write(data)
+        handle.write(outputString)
 
 
 def get_solution_manifold(data):
