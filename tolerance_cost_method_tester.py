@@ -14,39 +14,28 @@ import scipy.optimize
 
 def evaluate(x, distribution, simulator):
     """ This is the evaluation function, which produces a single numerical
-    output which the scipy optimizer will attempt to minimize. 
+    output which the scipy optimizer will attempt to minimize. In our case,
+    imagine that this is a function F(u, v) which we are trying to minimize.
+    The variables u and v are the x and y shift in the distribution,
+    respectively.  The scipy optimizer will attempt to minimize F by making
+    repeated calls to this function to test its gradient and value.  The
+    optimizer will provide u and v to us in the form of the numpy array 'x'
+    which will take the form of x = [u, v].  It's up to us to perform the
+    evaluation here and return the result."""
 
-    In our case, imagine that this is a function F(u, v) which we are trying to
-    minimize. The variables u and v are the x and y shift in the distribution,
-    and the value of the function F is the mean of the closest approaches of a
-    distribution shifted by u and v.
-
-    The scipy optimizer will attempt to minimize F by making repeated calls to
-    this function to test its gradient and value.  The optimizer will provide u
-    and v to us in the form of the numpy array 'x' (the first argument in this
-    function) which we will interpret as taking the form of x = [u, v].  It's up
-    to us to perform the evaluation here and return the result."""
-
-    # Extract u and v from the x array given to us by scipy
     u, v = x 
-
-    # Create a temporary test distribution that is shifted by u and v
     test = [(angle + u, stretch + v) for angle, stretch in distribution ]
     
-    # Calculate the sum of the distributions 
     sumValue = 0
     for angle, stretch in test:
         sumValue += abs(simulator.get_closest_approach(angle, stretch))
-
-    # Return the mean value
-    return sumValue / len(test)
+    return sumValue
 
 def main():
     # Load the distribution of tests
     testFolder = "Data/tolerance_test"
-    testFiles = [os.path.join(testFolder, item) for item in os.listdir(testFolder) if item.endswith(".json")]
-    testSet = testFiles
-
+    testSet = [os.path.join(testFolder, item) for item in os.listdir(testFolder) if item.endswith(".json")]
+    
     # Begin by verifying that all of the specified tests actually have the same
     # setting parameters and so lie on the same solution manifold.  This is
     # critical for the results of this test to make any sense.  If any of the
@@ -75,21 +64,27 @@ def main():
     # Check the initial score
     initialScore = evaluate(x0, distribution, simulator)
 
-    # Perform the optimization, a basin-hopping global search using the Nelder-
-    # Mead downhill simplex algorithm
-    result = scipy.optimize.basinhopping(evaluate, x0, minimizer_kwargs={"method":"Nelder-Mead", "args":(distribution, simulator)}, niter=50)
-    
-    # Evaluate the optimized score
-    finalScore = evaluate(result.x, distribution, simulator)
-    
-    # Print the results
-    print "Initial score: {:.2f} px".format(initialScore)
-    print "Final score:   {:.2f} px".format(finalScore)
-    print "Difference:    {:.2f} px".format(initialScore-finalScore)
-    print "Shift:         (angle = {:.3f}, stretch = {:.3f})".format(result.x[0], result.x[1])        
-    print ""
+    # Perform the optimization
+    methods = ['Powell'] # ['Nelder-Mead', 'COBYLA', ]
+    for method in methods:
+        result = scipy.optimize.minimize(evaluate, x0, method=method, args=(distribution, simulator) )
+        # print result
 
-    # Close the simulator process that's running in the background
+        print "Method: {}".format(method)
+        print "============================="
+        print "Local optimization:"
+        print "    Initial score: {:.1f} px".format(initialScore)
+        print "    Final score:   {:.1f} px".format(evaluate(result.x, distribution, simulator))
+        print "    Success:    {}".format(result.success)
+
+        # Basin hopping
+        result = scipy.optimize.basinhopping(evaluate, x0, minimizer_kwargs={"method":method, "args":(distribution, simulator)}, niter=10)
+        # print result
+        print "Global (basin hopping):"
+        print "    Initial score: {:.1f} px".format(initialScore)
+        print "    Final score:   {:.1f} px".format(evaluate(result.x, distribution, simulator))
+        
+        print ""
     simulator.close_process()
 
 
