@@ -1,6 +1,5 @@
 Data/
 manifold_cache/
-manifold_binaries/
 matlab_samples/
 *.pyc
 
