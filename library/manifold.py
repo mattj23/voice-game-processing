@@ -12,15 +12,13 @@ import os
 import json
 import datetime
 import subprocess
-import zipfile
-import zlib
 import hashlib
 import math
-import time 
 
 MODULE_PATH = os.path.dirname(__file__)
 BINARY_FOLDER = os.path.join(MODULE_PATH, "manifold_binaries")
 CACHE_FOLDER  = os.path.join(MODULE_PATH, "manifold_cache")
+
 
 class SolutionManifold:
     """ The SolutionManifold class exists to perform live computations of the
@@ -30,23 +28,23 @@ class SolutionManifold:
     When finished, the process is closed with a termination command. """
     process = None
 
-    def __init__(self, settingsObject):
-        """ Create an isntance of the ComputeManifold class, using a settings
+    def __init__(self, settings_object):
+        """ Create an instance of the ComputeManifold class, using a settings
         dictionary object to give the ComputeSolution.exe process the parameters
         of the simulation. """
 
         # Find the executable and create a process
         # The manifold was not cached and must be generated.
-        currentDirectory = os.getcwd()
+        current_directory = os.getcwd()
 
         os.chdir(BINARY_FOLDER)
         if os.path.exists("settings.json"):
             os.remove("settings.json")
 
         with open("settings.json", "w") as handle:
-            handle.write(json.dumps(settingsObject, indent=4))
+            handle.write(json.dumps(settings_object, indent=4))
         self.process = subprocess.Popen("ComputeSolution.exe", stdin=subprocess.PIPE, stdout=subprocess.PIPE, bufsize=256)
-        os.chdir(currentDirectory)
+        os.chdir(current_directory)
 
     def get_closest_approach(self, angle, stretch):
         """ Feed the angle and stretch to the embedded simulation process and
@@ -60,95 +58,6 @@ class SolutionManifold:
     def close_process(self):
         self.process.stdin.write("end\n")
 
-
-class SolutionManifold_obselete:
-    """ The SolutionManifold class exists to speed up interpolation lookups on a
-    solution manifold. """
-    data = {}
-    angles = []
-    stretches = []
-    anglePitch = 0
-    stretchPitch = 0
-
-
-    def __init__(self, manifold):
-        """ Initialize a SolutionManifold class using a manifold data
-        dictionary, creating the interpolation models and all. """
-        # Set the internal data dictionary to the provided manifold
-        self.data = manifold 
-
-        # Capture the angles and stretches
-        angles = list(set([p['angle'] for k, p in manifold.items()]))
-        stretches = list(set([p['stretch'] for k, p in manifold.items()]))
-        angles.sort()
-        stretches.sort()
-
-        # Create the mathematical model of the stretches and the angles, such
-        # that when given a stretch or an angle it returns the closest values
-        self.angles = angles
-        self.stretches = stretches
-        self.anglePitch = (max(angles) - min(angles)) / (len(angles) - 1)
-        self.stretchPitch = (max(stretches) - min(stretches)) / (len(stretches) - 1)
-
-    def get_angle_set(self, angle):
-        index = int((angle - self.angles[0]) / self.anglePitch)
-        return self.angles[index], self.angles[index + 1]
-
-    def get_stretch_set(self, stretch):
-        index = int((stretch - self.stretches[0]) / self.stretchPitch)
-        return self.stretches[index], self.stretches[index + 1]
-
-    def get(self, angle, stretch):
-        """ Perform a lookup to get the closest approach at the element below """
-        x1, x2 = self.get_angle_set(angle)
-        y1, y2 = self.get_stretch_set(stretch)
-
-        # Check to make sure everything is kosher
-        if x1 > angle or x2 < angle:
-            raise Exception("angle interpolation didn't work")
-        if y1 > stretch or y2 < stretch:
-            raise Exception("stretch interpolation didn't work")
-
-        print (x1, angle, x2)
-        print (y1, stretch, y2)
-        # print self.data[(x1, y1)]['cpa']
-        return self.data[(x1, y1)]['cpa']
-
-    def interpolate(self, angle, stretch):
-        """ Perform a bilinear interpolation to find the approximate value of
-        the solution manifold at a given angle and stretch """
-        x1, x2 = self.get_angle_set(angle)
-        y1, y2 = self.get_stretch_set(stretch)
-
-        # Check to make sure everything is kosher
-        if x1 > angle or x2 < angle:
-            raise Exception("angle interpolation didn't work")
-        if y1 > stretch or y2 < stretch:
-            raise Exception("stretch interpolation didn't work")
-
-        q11 = self.data[(x1, y1)]['cpa']
-        q12 = self.data[(x1, y2)]['cpa']
-        q21 = self.data[(x2, y1)]['cpa']
-        q22 = self.data[(x2, y2)]['cpa']
-
-        r1 = (x2 - angle)/(x2 - x1) * q11 + (angle - x1)/(x2 - x1) * q21 
-        r2 = (x2 - angle)/(x2 - x1) * q12 + (angle - x1)/(x2 - x1) * q22 
-        p  = (y2 - stretch)/(y2 - y1) * r1 + (stretch - y1)/(y2 - y1) * r2 
-        return p
-
-def load_test_file(filepath): 
-    """ Given the file path of a .json test file, open that test file and use
-    the json module to parse the contents into a results dictionary, then return
-    it from the function.
-    """
-    with open(filepath, "r") as handle:
-        contents = handle.read()
-        results  = json.loads(contents)
-
-    # Convert the string timestamp into a python datetime object 
-    timestamp = datetime.datetime.strptime(results['timestamp'], "%H:%M:%S, %Y-%m-%d")
-    results['timestamp'] = timestamp
-    return results
 
 def get_angle(pitch, data):
     """ Compute the angle associated with any pitch the same way that the game
@@ -165,6 +74,7 @@ def get_angle(pitch, data):
         fraction = 1
     return fraction * (data['settings']['AngleMaximum'] - data['settings']['AngleMinimum']) + (data['settings']['AngleMaximum'] + data['settings']['AngleMinimum']) / 2.0
 
+
 def get_stretch(volume, data):
     """ Compute the stretch associated with any volume the same way that the
     game engine does it.""" 
@@ -174,6 +84,7 @@ def get_stretch(volume, data):
     if fraction > 1:
         fraction = 1
     return fraction * (data['settings']['StretchMaximum'] - data['settings']['StretchMinimum']) + data['settings']['StretchMinimum']
+
 
 def validate_same_manifold(testFiles):
     """ Given a list of test files, validate that they all have the same
@@ -264,15 +175,15 @@ def save_cached_manifold(token, manifold):
     if not os.path.exists(CACHE_FOLDER):
         os.mkdir(CACHE_FOLDER)
 
-    outputPath = os.path.join(CACHE_FOLDER, "{}.mfld".format(token))
+    output_path = os.path.join(CACHE_FOLDER, "{}.mfld".format(token))
 
     output = []
     for k, v in manifold.items():
         output.append("{angle},{stretch},{cpa},{outcome}".format(**v))
-    outputString = "\n".join(output)
+    output_string = "\n".join(output)
 
-    with open(outputPath, "w") as handle:
-        handle.write(outputString)
+    with open(output_path, "w") as handle:
+        handle.write(output_string)
 
 
 def get_solution_manifold(data):
@@ -290,7 +201,7 @@ def get_solution_manifold(data):
     if cached:
         return cached 
     # The manifold was not cached and must be generated.
-    currentDirectory = os.getcwd()
+    current_directory = os.getcwd()
 
     os.chdir(BINARY_FOLDER)
     if os.path.exists("settings.json"):
@@ -302,12 +213,13 @@ def get_solution_manifold(data):
 
     subprocess.call(["Manifold Mapper.exe"])
     manifold = load_solution_manifold("solution_manifold.txt")
-    os.chdir(currentDirectory)
+    os.chdir(current_directory)
 
     # Cache the manifold so we won't have to do this again in the future
     save_cached_manifold(token, manifold)
 
     return manifold
+
 
 def get_manifold_matrix(manifold):
     """ Transform the solution manifold as computer or loaded from cache into a
@@ -326,9 +238,10 @@ def get_manifold_matrix(manifold):
 
     return angles, stretches, output
 
+
 def get_manifold_draw_matrix(manifold):
     """ Given a manifold list/dictionary object, generate the nested list which
-    can be directly converted to a numpy n-dimenisonal array and plotted via
+    can be directly converted to a numpy n-dimensional array and plotted via
     imshow, as well as the x and y axis lists."""
 
     # Resolve the unique angles and stretches, and get the furthest closest
@@ -352,7 +265,7 @@ def get_manifold_draw_matrix(manifold):
             outcome = manifold[key]['outcome']
 
             if outcome == "hit":
-                row.append([1,1,1])
+                row.append([1, 1, 1])
             else:
                 value = (cpaMax - cpa) / cpaMax
                 if value < 0:

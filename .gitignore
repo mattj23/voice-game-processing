@@ -1,5 +1,7 @@
 Data/
 manifold_cache/
 matlab_samples/
+manifold_binaries/settings.json
+manifold_binaries/solution_manifold.txt
 *.pyc
 

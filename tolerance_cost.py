@@ -6,7 +6,7 @@
 
 import os
 import json
-import manifold_library
+import library.manifold
 import numpy
 import time
 

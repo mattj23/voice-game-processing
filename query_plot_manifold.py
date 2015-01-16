@@ -5,13 +5,7 @@
 
 """
 
-TEST_FILE = r"D:\Workbench\PERSONAL\Voice\Processing\Solution Manifold 20141007\Hard Problem\Test 2014-09-13_15-04-44.json"
-
-
-import os       
-import json     
-import datetime 
-import math 
+import os
 import sys 
 
 import matplotlib
@@ -20,24 +14,20 @@ import numpy
 import matplotlib.cm as cm 
 import matplotlib.mlab as mlab 
 
-import manifold_library
+import library.manifold
 
 from matplotlib.collections import LineCollection
 
 
 def main():
-    global TEST_FILE
 
-    if len(sys.argv) > 1:
-        TEST_FILE = sys.argv[1]
+    # Get a test file from data
+    test_files = [item for item in os.listdir('data') if item.endswith(".json")]
+    data = library.manifold.load_test_file(test_files[0])
 
-    if not os.path.exists(TEST_FILE):
-        raise Exception("Can't find '{}'".format(TEST_FILE))
+    manifold = library.manifold.get_solution_manifold(data)
 
-    data = manifold_library.load_test_file(TEST_FILE)
-    manifold = manifold_library.get_solution_manifold(data)
-
-    angles, stretches, output = manifold_library.get_manifold_draw_matrix(manifold)
+    angles, stretches, output = library.manifold.get_manifold_draw_matrix(manifold)
     x = numpy.array(angles)
     y = numpy.array(stretches)
     z = numpy.array(output)
