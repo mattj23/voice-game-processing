@@ -120,51 +120,51 @@ class TestGroup:
         Simple filtering: use dictionary based filter to sort the existing elements in the group. The filter_data
         dictionary/dictionaries should be of the form:
 
-            {   "key":name_of_key_to_filter_on,
-                "value":value_to_filter_with }
+            {   key1:value1, key2:value2  }
 
         The value can be a single value, in the case of a simple match, or a function which returns true or false based
          on the filter conditions.
         :param filter_data: a dictionary or list of dictionaries containing the filter items to match
         :return: a TestGroup of the items which passed the filter
         """
-        if type(filter_data) is list:
-            group = TestGroup()
-            for element in filter_data:
-                group += self.filter(element)
-            return group
-
         if type(filter_data) is not dict:
-            raise Exception("The filter_data argument must be a dictionary or list of dictionaries")
+            raise Exception("The filter_data argument must be a dictionary")
 
-        if "key" not in filter_data.keys():
-            raise Exception("The filter_data dictionary argument must be a dictionary with an element named 'key' in it")
+        reduced = list(self.files)
+        for key, value in filter_data.items():
 
-        if "value" not in filter_data.keys():
-            raise Exception("The filter_data dictionary argument must be a dictionary with an element named 'value' in it")
-
-        if hasattr(filter_data['value'], '__call__'):
-            # the sorting value is a callable object (a function) and should be used to evaluate the filter
             subgroup = []
-            function = filter_data['value']
-            for item in self.files:
-                data = load_test_file(item)
-                if data is not None:
-                    if function(data[filter_data['key']]):
-                        subgroup.append(item)
-            return TestGroup(subgroup)
+            if hasattr(value, '__call__'):
+                # the sorting value is a callable object (a function) and should be used to evaluate the filter
+                function = value
+                for item in reduced:
+                    data = load_test_file(item)
+                    if data is not None:
+                        if function(data[key]):
+                            subgroup.append(item)
+            else:
+                for item in reduced:
+                    data = load_test_file(item)
+                    if data is not None:
+                        if data[key] == value:
+                            subgroup.append(item)
+            reduced = list(subgroup)
 
-        # if we've reached this point, the filter_data['value'] element is not callable, so we will assume it is a value
-        # of the same type as the filter element key and attempt an == match
-        subgroup = []
-        for item in self.files:
-            data = load_test_file(item)
-            if data[filter_data['key']] == filter_data['value']:
-                subgroup.append(item)
-        return TestGroup(subgroup)
+        return TestGroup(reduced)
 
+    def save_to_file(self, file_path):
+        """
+        Save the group to a zip file at file_path
+        """
+        # TODO: implement TestGroup.save_to_file()
+        raise Exception("TestGroup.save_to_file() is not implemented yet")
 
-
+    def load_from_file(self, file_path):
+        """
+        Load a group from a zip file at file_path
+        """
+        # TODO: implement TestGroup.load_from_file()
+        raise Exception("TestGroup.load_from_file() is not implemented yet")
 
 def load_test_file(filepath):
     """

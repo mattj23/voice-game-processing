@@ -10,10 +10,10 @@
 
 import os
 import json
-import datetime
 import subprocess
 import hashlib
 import math
+import tests
 
 MODULE_PATH = os.path.dirname(__file__)
 BINARY_FOLDER = os.path.join(MODULE_PATH, "manifold_binaries")
@@ -86,17 +86,40 @@ def get_stretch(volume, data):
     return fraction * (data['settings']['StretchMaximum'] - data['settings']['StretchMinimum']) + data['settings']['StretchMinimum']
 
 
-def validate_same_manifold(testFiles):
-    """ Given a list of test files, validate that they all have the same
-    settings such that their manifolds are identical. This is for the pre-
-    analysis validation of code that attempts to do some sort of analysis which
-    requires a set of tests to all lie on the same manifold. Return True if the
-    manifold tokens are all the same, return False if they're not."""
+def validate_same_manifold(test_list):
+    """
+    Given a list of test data or test files, validate that they have the same settings such that their manifolds are
+    identical. This is for pre-analysis validation of any code that attempts to perform some analysis which requires all
+    tests in an analysis set to be on the same solution manifold. Return True if the manifold tokens are all the same,
+    return False if they are not.
+    :param test_list: a list of test files or a list of test result dictionaries
+    :return: True if the tests all lie on the same manifold, False if they do not
+    """
+
+    # If the elements of test are all dictionaries with the "settings" key in them, we continue as expected. If they are
+    # strings then we assume they are filepaths and attempt to load them.  Technically they can be mixed (filenames and
+    # result dictionaries) but that's bad practice.
+    test_data = []
+    for element in test_list:
+        if type(element) is dict:
+            if "settings" in element.keys():
+                test_data.append(element)
+            else:
+                raise Exception("An element in test_list is a dictionary but does not have a settings subelement")
+        elif type(element) is str:
+            data = tests.load_test_file(element)
+            if data is None:
+                raise Exception("An element in test_list is a string but cannot be loaded as a test file")
+            else:
+                test_data.append(data)
+        else:
+            raise Exception("An element in test_list is neither dictionary nor string")
+
+    # Check to make sure that they all have the same manifold token
     tokens = {}
-    for test in testFiles:
-        data = load_test_file(test)
-        token = generate_manifold_token(data)
-        tokens[token] = 1
+    for test in test_data:
+        token = generate_manifold_token(test)
+        tokens[token] = None
     if len(tokens.keys()) == 1:
         return True
     return False

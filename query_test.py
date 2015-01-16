@@ -1,16 +1,17 @@
 
 import library.tests
-
+import library.costs
 
 def main():
     print "Loading library..."
 
     tests = library.tests.TestLibrary("data")
+    tests = tests.filter({"subject": "Jarrad"})
 
-    results = tests.filter({"subject": "Jarrad"})
 
-    for result in results:
-        print result
+    results = library.costs.compute_tolerance_cost(tests)
+    print results
+
 
 
 if __name__ == "__main__":

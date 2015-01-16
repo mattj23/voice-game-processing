@@ -6,6 +6,8 @@
 """
 
 import manifold
+import tests
+
 import scipy.optimize
 
 
@@ -38,5 +40,83 @@ def __tolerance_evaluate(x, distribution, simulator):
     # Return the mean value
     return sum_value / len(test)
 
-def compute_tolerance_cost():
-    pass
+def __load_tests(test_group):
+    """
+    Load the test data from a TestGroup object or a list of test filenames and return them as a list of test
+    dictionaries.  Raise an exception if the data is not at TestGroup or list of test file names.
+    :param test_group: Either a TestGroup object or a list of filenames
+    :return:
+    """
+    if isinstance(test_group, tests.TestGroup) or isinstance(test_group, tests.TestLibrary):
+        test_group = test_group.files
+
+    if type(test_group) is not list:
+        raise Exception("Expecting a TestGroup or list of test file names")
+
+    test_data = []
+    failed = []
+    for item in test_group:
+        data = tests.load_test_file(item)
+        if data is None:
+            failed.append(item)
+        else:
+            test_data.append(data)
+
+    if failed:
+        raise Exception("Loading tests failed on: " + ", ".join(failed) )
+    return test_data
+
+def compute_tolerance_cost(test_group):
+    """
+    Compute the tolerance cost for a TestGroup object or a list of filepaths. Return a dictionary with the results of
+    the analysis, including the tolerance cost, the initial score, the final score, the shift and the shifted
+    distribution, and a string description of the output of the analysis.
+    :param test_group: a TestGroup object or a list of paths of test .json files
+    :return: a results dictionary
+    """
+    test_data = __load_tests(test_group)
+    if not manifold.validate_same_manifold(test_data):
+        raise Exception("The test group provided has tests which do not all lie on the same solution manifold")
+
+    # Now that we've got the test data loaded and validated, we can create a simulator object based off of the settings
+    # of the first test in the list (we have just validated that they are all the same, so this is acceptable)
+    simulator = manifold.SolutionManifold(test_data[0]['settings'])
+
+    # Now let's assemble the test distribution, which ends up as a nested list of release angle and stretch pairs.
+    distribution = []
+    for data in test_data:
+        release_angle   = data['release_angle']
+        release_stretch = data['release_stretch']
+        distribution.append([release_angle, release_stretch])
+
+    # Create the initial guess
+    x0 = [0, 0]
+
+    # Check the initial score
+    initial_score = __tolerance_evaluate(x0, distribution, simulator)
+
+    # Perform the optimization, a basin-hopping global search using the Nelder-Mead downhill simplex algorithm
+    result = scipy.optimize.basinhopping(__tolerance_evaluate, x0, minimizer_kwargs={"method":"Nelder-Mead", "args":(distribution, simulator)}, niter=50)
+
+    # Evaluate the optimized score
+    final_score = __tolerance_evaluate(result.x, distribution, simulator)
+
+    # Print the results
+    description = []
+    description.append("Initial score: {:.2f} px".format(initial_score))
+    description.append("Final score:   {:.2f} px".format(final_score))
+    description.append("Difference:    {:.2f} px".format(initial_score-final_score))
+    description.append("Shift:         (angle = {:.3f}, stretch = {:.3f})".format(result.x[0], result.x[1]))
+    description = "\n".join(description)
+
+    # Close the simulator process that's running in the background
+    simulator.close_process()
+
+    output = {  "cost": initial_score - final_score,
+                "description": description,
+                "initial_score": initial_score,
+                "final_score": final_score,
+                "shift": (result.x[0], result.x[1]),
+                "shifted_points": [[a + result.x[0], v + result.x[1]] for a, v in distribution] }
+
+    return output
