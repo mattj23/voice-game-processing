@@ -66,6 +66,7 @@ def __load_tests(test_group):
         raise Exception("Loading tests failed on: " + ", ".join(failed) )
     return test_data
 
+
 def compute_tolerance_cost(test_group):
     """
     Compute the tolerance cost for a TestGroup object or a list of filepaths. Return a dictionary with the results of
@@ -120,3 +121,69 @@ def compute_tolerance_cost(test_group):
                 "shifted_points": [[a + result.x[0], v + result.x[1]] for a, v in distribution] }
 
     return output
+
+
+def compute_covariation_cost(test_group):
+    """
+    Compute the covariation cost according to the algorithm described in Cohen and Sternad 2009. Return a results
+    dictionary containing the cost and the initial and final scores.
+    :param test_group: a TestGroup object or a list of paths of test .json files
+    :return: a results dictionary
+    """
+    test_data = __load_tests(test_group)
+    if not manifold.validate_same_manifold(test_data):
+        raise Exception("The test group provided has tests which do not all lie on the same solution manifold")
+
+    # Now that we've got the test data loaded and validated, we can create a simulator object based off of the settings
+    # of the first test in the list (we have just validated that they are all the same, so this is acceptable)
+    simulator = manifold.SolutionManifold(test_data[0]['settings'])
+
+    # Now let's assemble the test distribution, which ends up as a list of release angle and stretch scores with
+    # their resulting score.
+    distribution = []
+    for data in test_data:
+        release_angle   = data['release_angle']
+        release_stretch = data['release_stretch']
+        score           = abs(simulator.get_closest_approach(release_angle, release_stretch))
+        distribution.append({"a": release_angle, "s": release_stretch, "score": score})
+
+    # Now we put them in order from best to worst score
+    distribution.sort(key=lambda x: x['score'])
+
+    for element in distribution:
+        print element
+
+    n = len(distribution) - 1
+    pre_optimized_score = sum([x['score'] for x in distribution]) / len(distribution)
+
+    while n > 0:
+        profitable = 0
+
+        offset = 1
+
+        while n - offset >= 0:
+            # Compute the mean score
+            intial_score = distribution[n]['score'] + distribution[n - offset]['score']
+
+            # Perform the swap and evaluate the new score
+            d = [dict(pair) for pair in distribution]
+            d[n]['s'], d[n - offset]['s'] = d[n - offset]['s'], d[n]['s']
+            d[n]['score'] = abs(simulator.get_closest_approach(d[n]['a'], d[n]['s']))
+            d[n-offset]['score'] = abs(simulator.get_closest_approach(d[n - offset]['a'], d[n - offset]['s']))
+            swapped_score = d[n]['score'] + d[n - offset]['score']
+
+            # If the score improved, update the distribution and record a profitable swap
+            if swapped_score < intial_score:
+                profitable += 1
+                distribution = [dict(pair) for pair in d]
+            offset += 1
+
+        if not profitable:
+            break
+
+        n -= 1
+
+    post_optimized_score = sum([x['score'] for x in distribution]) / len(distribution)
+
+
+    return {}

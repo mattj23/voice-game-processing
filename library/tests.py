@@ -115,6 +115,20 @@ class TestGroup:
         attributes, filenames = self.get_list_of_key(key)
         return list(set(attributes))
 
+    def get_data_list(self):
+        """
+        Return a list of python dictionaries containing the data in the test group
+        :return: list of python dictionaries
+        """
+        return [load_test_file(path) for path in self.files]
+
+    def get_release_points(self):
+        """
+        Return a list of release angles and stretches
+        :return: a list of 2-element lists containing the release angle and stretches
+        """
+        return [[r['release_angle'], r['release_stretch']] for r in self.get_data_list()]
+
     def filter(self, filter_data):
         """
         Simple filtering: use dictionary based filter to sort the existing elements in the group. The filter_data

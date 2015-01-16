@@ -2,10 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cbda80f2-98f1-4e31-bc81-392232008a04" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/library/costs.py" afterPath="$PROJECT_DIR$/library/costs.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/library/manifold.py" afterPath="$PROJECT_DIR$/library/manifold.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/query_test.py" afterPath="$PROJECT_DIR$/query_test.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/library/tests.py" afterPath="$PROJECT_DIR$/library/tests.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MOVED" beforePath="E:\Research\Voice Game\voice-game-processing\plot_manifold_releases.py" afterPath="$PROJECT_DIR$/plot_manifold.py" />
     </list>
     <ignored path="voice-game-processing.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -29,11 +32,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="manifold.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="manifold.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/library/manifold.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="252" max-vertical-offset="3732">
-              <caret line="124" column="16" selection-start-line="124" selection-start-column="16" selection-end-line="124" selection-end-column="16" />
+            <state vertical-scroll-proportion="0.74242425" vertical-offset="2500" max-vertical-offset="3768">
+              <caret line="241" column="31" selection-start-line="241" selection-start-column="31" selection-end-line="241" selection-end-column="31" />
               <folding>
                 <element signature="e#405#414#0" expanded="true" />
               </folding>
@@ -44,8 +47,8 @@
       <file leaf-file-name="costs.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/library/costs.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="216" max-vertical-offset="1524">
-              <caret line="99" column="0" selection-start-line="99" selection-start-column="0" selection-end-line="99" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1187" max-vertical-offset="2340">
+              <caret line="183" column="9" selection-start-line="183" selection-start-column="9" selection-end-line="183" selection-end-column="9" />
               <folding>
                 <element signature="e#156#171#0" expanded="true" />
               </folding>
@@ -56,8 +59,8 @@
       <file leaf-file-name="tests.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/library/tests.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2376">
-              <caret line="160" column="0" selection-start-line="160" selection-start-column="0" selection-end-line="160" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1188" max-vertical-offset="2544">
+              <caret line="124" column="26" selection-start-line="124" selection-start-column="8" selection-end-line="124" selection-end-column="26" />
               <folding>
                 <element signature="e#202#213#0" expanded="true" />
               </folding>
@@ -81,7 +84,7 @@
         <entry file="file://$PROJECT_DIR$/tolerance_cost.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0" vertical-offset="683" max-vertical-offset="1224">
-              <caret line="92" column="29" selection-start-line="60" selection-start-column="4" selection-end-line="92" selection-end-column="29" />
+              <caret line="90" column="0" selection-start-line="90" selection-start-column="0" selection-end-line="90" selection-end-column="0" />
               <folding>
                 <element signature="e#84#93#0" expanded="true" />
               </folding>
@@ -89,14 +92,46 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="query_test.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="query_test.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/query_test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.26617375" vertical-offset="0" max-vertical-offset="541">
-              <caret line="12" column="17" selection-start-line="12" selection-start-column="17" selection-end-line="12" selection-end-column="17" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="468">
+              <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
               <folding>
                 <element signature="e#1#21#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="output_solution_manifold.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/output_solution_manifold.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="552">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="plot_manifold.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/plot_manifold.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="275" max-vertical-offset="816">
+              <caret line="57" column="25" selection-start-line="57" selection-start-column="25" selection-end-line="57" selection-end-column="25" />
+              <folding>
+                <element signature="e#364#381#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="plot_manifold_trace.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/plot_manifold_trace.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1080">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -115,10 +150,12 @@
         <option value="$PROJECT_DIR$/tolerance_cost.py" />
         <option value="$PROJECT_DIR$/library/manifold_binaries/costs.py" />
         <option value="$PROJECT_DIR$/library/groups.py" />
-        <option value="$PROJECT_DIR$/library/tests.py" />
-        <option value="$PROJECT_DIR$/library/manifold.py" />
         <option value="$PROJECT_DIR$/library/costs.py" />
+        <option value="$PROJECT_DIR$/plot_manifold_releases.py" />
+        <option value="$PROJECT_DIR$/library/tests.py" />
+        <option value="$PROJECT_DIR$/plot_manifold.py" />
         <option value="$PROJECT_DIR$/query_test.py" />
+        <option value="$PROJECT_DIR$/library/manifold.py" />
       </list>
     </option>
   </component>
@@ -422,7 +459,19 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="6" />
+      <breakpoints>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/library/costs.py</url>
+          <line>180</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="python-line">
+          <url>file://$PROJECT_DIR$/library/costs.py</url>
+          <line>183</line>
+          <option name="timeStamp" value="14" />
+        </line-breakpoint>
+      </breakpoints>
+      <option name="time" value="21" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -500,20 +549,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/library/manifold.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="252" max-vertical-offset="3732">
-          <caret line="124" column="16" selection-start-line="124" selection-start-column="16" selection-end-line="124" selection-end-column="16" />
-          <folding>
-            <element signature="e#405#414#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tolerance_cost.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="683" max-vertical-offset="1224">
-          <caret line="92" column="29" selection-start-line="60" selection-start-column="4" selection-end-line="92" selection-end-column="29" />
+          <caret line="90" column="0" selection-start-line="90" selection-start-column="0" selection-end-line="90" selection-end-column="0" />
           <folding>
             <element signature="e#84#93#0" expanded="true" />
           </folding>
@@ -522,8 +561,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/library/tests.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2376">
-          <caret line="160" column="0" selection-start-line="160" selection-start-column="0" selection-end-line="160" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="1188" max-vertical-offset="2544">
+          <caret line="124" column="26" selection-start-line="124" selection-start-column="8" selection-end-line="124" selection-end-column="26" />
           <folding>
             <element signature="e#202#213#0" expanded="true" />
           </folding>
@@ -532,20 +571,56 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/library/costs.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="216" max-vertical-offset="1524">
-          <caret line="99" column="0" selection-start-line="99" selection-start-column="0" selection-end-line="99" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="1716" max-vertical-offset="2340">
+          <caret line="183" column="9" selection-start-line="183" selection-start-column="9" selection-end-line="183" selection-end-column="9" />
           <folding>
             <element signature="e#156#171#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/plot_manifold_trace.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1080">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/plot_manifold.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="275" max-vertical-offset="816">
+          <caret line="57" column="25" selection-start-line="57" selection-start-column="25" selection-end-line="57" selection-end-column="25" />
+          <folding>
+            <element signature="e#364#381#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/output_solution_manifold.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="552">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/query_test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.26617375" vertical-offset="0" max-vertical-offset="541">
-          <caret line="12" column="17" selection-start-line="12" selection-start-column="17" selection-end-line="12" selection-end-column="17" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="468">
+          <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
           <folding>
             <element signature="e#1#21#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/library/manifold.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.74242425" vertical-offset="2500" max-vertical-offset="3768">
+          <caret line="241" column="31" selection-start-line="241" selection-start-column="31" selection-end-line="241" selection-end-column="31" />
+          <folding>
+            <element signature="e#405#414#0" expanded="true" />
           </folding>
         </state>
       </provider>

@@ -92,9 +92,11 @@ def validate_same_manifold(test_list):
     identical. This is for pre-analysis validation of any code that attempts to perform some analysis which requires all
     tests in an analysis set to be on the same solution manifold. Return True if the manifold tokens are all the same,
     return False if they are not.
-    :param test_list: a list of test files or a list of test result dictionaries
+    :param test_list: a list of test files or a list of test result dictionaries, or a TestGroup object
     :return: True if the tests all lie on the same manifold, False if they do not
     """
+    if isinstance(test_list, tests.TestGroup):
+        test_list = test_list.get_data_list()
 
     # If the elements of test are all dictionaries with the "settings" key in them, we continue as expected. If they are
     # strings then we assume they are filepaths and attempt to load them.  Technically they can be mixed (filenames and
@@ -113,7 +115,7 @@ def validate_same_manifold(test_list):
             else:
                 test_data.append(data)
         else:
-            raise Exception("An element in test_list is neither dictionary nor string")
+            raise Exception("An element in test_list is neither dictionary nor string nor TestGroup object")
 
     # Check to make sure that they all have the same manifold token
     tokens = {}
@@ -200,7 +202,7 @@ def save_cached_manifold(token, manifold):
 
     output_path = os.path.join(CACHE_FOLDER, "{}.mfld".format(token))
 
-    output = []
+    output = ["angle,stretch,cpa,outcome"]
     for k, v in manifold.items():
         output.append("{angle},{stretch},{cpa},{outcome}".format(**v))
     output_string = "\n".join(output)
@@ -236,6 +238,7 @@ def get_solution_manifold(data):
 
     subprocess.call(["Manifold Mapper.exe"])
     manifold = load_solution_manifold("solution_manifold.txt")
+    os.remove("solution_manifold.txt")
     os.chdir(current_directory)
 
     # Cache the manifold so we won't have to do this again in the future
