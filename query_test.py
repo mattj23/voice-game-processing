@@ -3,6 +3,7 @@ import library.tests
 import library.costs
 import plot_manifold
 
+import datetime
 
 def main():
 
@@ -29,6 +30,11 @@ def main():
     # Plot the manifold and the two point sets
     plot_manifold.plot(tests, "Tolerance Cost Shift", point_sets)
 
+    # And other stuff
+
+def main2():
+    tests = library.tests.TestLibrary("data")
+    print tests.summarize()
 
 if __name__ == "__main__":
-    main()
+    main2()

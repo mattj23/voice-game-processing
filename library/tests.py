@@ -8,54 +8,6 @@ import json
 import datetime
 import os
 
-class TestLibrary:
-    """
-    The TestLibrary class serves as a primitive database management system, and aids in the selection, grouping, and
-    filtering of test files.
-    """
-    library_path = None
-    files = None
-
-    def __init__(self, library_path):
-        """
-        :param library_path: the directory path that points at a folder full of test files
-        :return: None
-        """
-        # Set the library path
-        self.library_path = library_path
-        if not os.path.exists(self.library_path):
-            raise Exception("TestLibrary could not find the path '{}'".format(self.library_path))
-
-        # Update the self.files list from the library
-        self.update_library()
-
-    def update_library(self):
-        """
-        Go through the library_path and find all test files and verify them
-        :return:
-        """
-        file_objects = [os.path.join(self.library_path, item) for item in os.listdir(self.library_path) if item.endswith(".json")]
-
-        # Validate the files
-        validated = []
-        for item in file_objects:
-            if load_test_file(item) is not None:
-                validated.append(item)
-
-        self.files = validated
-
-    def get_group(self):
-        """
-        Return a TestGroup of all files in this library
-        """
-        return TestGroup(self.files)
-
-    def filter(self, filter_data):
-        """
-        Spawns a TestGroup and returns the filter of it.  A shortcut to filter.
-        """
-        return self.get_group().filter(filter_data)
-
 class TestGroup:
     """
     The TestGroup class is a group of test files.  It is similar to the TestLibrary except that it is not bound to
@@ -180,6 +132,155 @@ class TestGroup:
         # TODO: implement TestGroup.load_from_file()
         raise Exception("TestGroup.load_from_file() is not implemented yet")
 
+    def break_into_blocks(self, time_delay=datetime.timedelta(minutes=10)):
+        """
+        Break the group into a set of blocks, where a block is a set of time-adjacent trials from a consistent subject.
+        Return the results in the form of a dictionary:
+            { "subject1": [ [block1...], [block2...], "subject2": [ [block1...], [block2...]], ... }
+        :param time_delay: a datetime.timedelta object which gives the minimum span between two time-adjacent
+        trials in order to create a separate block
+        :return: a dictionary of blocks
+        """
+        output = {}
+
+        # Get the unique test subjects
+        subjects = self.get_unique_list_of_key('subject')
+
+        for subject in subjects:
+            # Get the timestamp and filenames of all tests with this subject
+            blocks = []
+            subject_files = []
+            for item in self.files:
+                data = load_test_file(item)
+                if data['subject'] == subject:
+                    subject_files.append([data['timestamp'], item])
+
+            # Sort the files by timestamp
+            subject_files.sort()
+
+            block = [subject_files[0]]
+            subject_files.remove(subject_files[0])
+
+            # Create blocks
+            for item in subject_files:
+                if item[0] - block[-1][0] > time_delay:
+                    # gap, form a new block
+                    if block:
+                        blocks.append([b[1] for b in block])
+                        block = [item]
+                else:
+                    block.append(item)
+            if block:
+                blocks.append([b[1] for b in block])
+
+            output[subject] = blocks
+
+        return output
+
+    def get_timespan(self):
+        """
+        Return a dictionary with the first and last test timestamp, as well as the span of the tests as a
+        datetime.timedelta object
+        """
+        first = None
+        last  = None
+
+        for item in self.files:
+            data = load_test_file(item)
+
+            if first is None or data['timestamp'] < first:
+                first = data['timestamp']
+
+            if last is None or data['timestamp'] > last:
+                last = data['timestamp']
+
+        return {"first": first, "last": last, "span": last - first}
+
+
+    def summarize(self):
+        """
+        Return a summary dictionary which gives information about the test group
+        """
+
+        # Though doing these computations manually instead of using the other functions seems redundant and more
+        # complex than necessary, the issue here is that each of those other functions performs a loop through the
+        # entire file list, requiring a disk access on each.  This way has redundant code, but only requires one pass
+        # through the file list, and thus one round of disk access only. On long lists of files this makes a difference.
+        subjects = []
+        count = 0
+        hits = 0
+        misses = 0
+        obstacle = 0
+        first = None
+        last  = None
+
+        for item in self.files:
+            data = load_test_file(item)
+            subjects.append(data['subject'])
+            count += 1
+            if data['outcome'] == "hit":
+                hits += 1
+            if data['outcome'] == "miss":
+                misses += 1
+            if data['outcome'] == "obstacle":
+                obstacle += 1
+
+            if first is None or data['timestamp'] < first:
+                first = data['timestamp']
+
+            if last is None or data['timestamp'] > last:
+                last = data['timestamp']
+
+        output = {  "subjects": list(set(subjects)),
+                    "count": count,
+                    "hits": hits,
+                    "misses": misses,
+                    "obstacles": obstacle,
+                    "timespan": td_format(last - first)}
+        return output
+
+class TestLibrary(TestGroup):
+    """
+    The TestLibrary class serves as a primitive database management system, and aids in the selection, grouping, and
+    filtering of test files.
+    """
+    library_path = None
+    files = None
+
+    def __init__(self, library_path):
+        """
+        :param library_path: the directory path that points at a folder full of test files
+        :return: None
+        """
+        TestGroup.__init__(self)
+
+        # Set the library path
+        self.library_path = library_path
+        if not os.path.exists(self.library_path):
+            raise Exception("TestLibrary could not find the path '{}'".format(self.library_path))
+
+        # Update the self.files list from the library
+        self.update_library()
+
+    def update_library(self):
+        """
+        Go through the library_path and find all test files and verify them
+        :return:
+        """
+        file_objects = [os.path.join(self.library_path, item) for item in os.listdir(self.library_path) if item.endswith(".json")]
+
+        # Validate the files
+        validated = []
+        for item in file_objects:
+            if load_test_file(item) is not None:
+                validated.append(item)
+
+        self.files = validated
+
+
+
+
+
 def load_test_file(filepath):
     """
     Given the path of a .json test file, load it, parse it to a test dictionary, and return it.  If the file does not
@@ -204,3 +305,25 @@ def load_test_file(filepath):
     timestamp = datetime.datetime.strptime(results['timestamp'], "%H:%M:%S, %Y-%m-%d")
     results['timestamp'] = timestamp
     return results
+
+def td_format(td_object):
+        seconds = int(td_object.total_seconds())
+        periods = [
+                ('year',        60*60*24*365),
+                ('month',       60*60*24*30),
+                ('day',         60*60*24),
+                ('hour',        60*60),
+                ('minute',      60),
+                ('second',      1)
+                ]
+
+        strings=[]
+        for period_name,period_seconds in periods:
+                if seconds > period_seconds:
+                        period_value , seconds = divmod(seconds,period_seconds)
+                        if period_value == 1:
+                                strings.append("%s %s" % (period_value, period_name))
+                        else:
+                                strings.append("%s %ss" % (period_value, period_name))
+
+        return ", ".join(strings)
