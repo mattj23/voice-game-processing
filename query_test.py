@@ -34,7 +34,7 @@ def main():
 
 def main2():
     tests = library.tests.TestLibrary("data")
-    print tests.summarize()
+    print tests.print_summary()
 
 if __name__ == "__main__":
     main2()

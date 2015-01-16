@@ -77,9 +77,9 @@ class TestGroup:
     def get_release_points(self):
         """
         Return a list of release angles and stretches
-        :return: a list of 2-element lists containing the release angle and stretches
+        :return: a list of 2-element tuples containing the release angle and stretches
         """
-        return [[r['release_angle'], r['release_stretch']] for r in self.get_data_list()]
+        return [(r['release_angle'], r['release_stretch']) for r in self.get_data_list()]
 
     def filter(self, filter_data):
         """
@@ -166,12 +166,12 @@ class TestGroup:
                 if item[0] - block[-1][0] > time_delay:
                     # gap, form a new block
                     if block:
-                        blocks.append([b[1] for b in block])
+                        blocks.append(TestGroup([b[1] for b in block]))
                         block = [item]
                 else:
                     block.append(item)
             if block:
-                blocks.append([b[1] for b in block])
+                blocks.append(TestGroup([b[1] for b in block]))
 
             output[subject] = blocks
 
@@ -238,6 +238,21 @@ class TestGroup:
                     "obstacles": obstacle,
                     "timespan": td_format(last - first)}
         return output
+
+    def print_summary(self):
+        """
+        Print a summary of the TestGroup to standard out
+        """
+        summary = self.summarize()
+        print "Group Summary:"
+        print "  Subjects:      {}".format(len(summary['subjects']))
+        print "                 {}".format(", ".join(summary['subjects']))
+        print "  Trials:        {count}".format(**summary)
+        print "  Hits:          {hits}".format(**summary)
+        print "  Misses:        {misses}".format(**summary)
+        print "  Obstacles:     {obstacles}".format(**summary)
+        print "  Time span:     {timespan}".format(**summary)
+
 
 class TestLibrary(TestGroup):
     """
