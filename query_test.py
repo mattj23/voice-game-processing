@@ -34,7 +34,7 @@ def main():
 
 def main2():
     tests = library.tests.TestLibrary("data")
-    print tests.print_summary()
+    plot_manifold.plot_traces(tests, "Traces")
 
 if __name__ == "__main__":
     main2()

@@ -241,7 +241,7 @@ Library code
                 source = library.tests.TestLibrary("path/to/data")
                 group  = source.filter( {"closest_approach":my_filter } )
 
-            An identical result can be performed with Python's lambda function definitions:
+            An identical result can be achieved with Python's lambda function definitions:
 
                 source = library.tests.TestLibrary("path/to/data")
                 group  = source.filter( {"closest_approach":lambda x : abs(x) < 10 } )
@@ -255,12 +255,12 @@ Library code
             externally from the function call.  The following filter returns all of Alice's hits where the stretch was
             less than 0.8:
 
-                data = {
+                conditions = {
                             "subject": "Alice",
                             "outcome": "hit",
                             "release_stretch": lambda x: x < 0.8
                 }
-                group = source.filter(data)
+                group = source.filter(conditions)
 
         Break into test blocks: TestGroup.break_into_blocks(time_delay)
         ===============================================================
@@ -338,4 +338,3 @@ Library code
                   Obstacles:     0
                   Time span:     1 minute, 3 seconds
 
-        
