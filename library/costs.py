@@ -150,9 +150,6 @@ def compute_covariation_cost(test_group):
     # Now we put them in order from best to worst score
     distribution.sort(key=lambda x: x['score'])
 
-    for element in distribution:
-        print element
-
     n = len(distribution) - 1
     pre_optimized_score = sum([x['score'] for x in distribution]) / len(distribution)
 
@@ -163,7 +160,7 @@ def compute_covariation_cost(test_group):
 
         while n - offset >= 0:
             # Compute the mean score
-            intial_score = distribution[n]['score'] + distribution[n - offset]['score']
+            initial_score = distribution[n]['score'] + distribution[n - offset]['score']
 
             # Perform the swap and evaluate the new score
             d = [dict(pair) for pair in distribution]
@@ -173,7 +170,7 @@ def compute_covariation_cost(test_group):
             swapped_score = d[n]['score'] + d[n - offset]['score']
 
             # If the score improved, update the distribution and record a profitable swap
-            if swapped_score < intial_score:
+            if swapped_score < initial_score:
                 profitable += 1
                 distribution = [dict(pair) for pair in d]
             offset += 1
@@ -184,6 +181,10 @@ def compute_covariation_cost(test_group):
         n -= 1
 
     post_optimized_score = sum([x['score'] for x in distribution]) / len(distribution)
+    simulator.close_process()
 
-
-    return {}
+    output = {  "initial_score": pre_optimized_score,
+                "final_score": post_optimized_score,
+                "cost": pre_optimized_score - post_optimized_score,
+                "shifted_points": [ (x['a'], x['s']) for x in distribution] }
+    return output

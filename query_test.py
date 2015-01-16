@@ -18,8 +18,7 @@ def main():
     initial_points = tests.get_release_points()
 
     # Prepare the shifted points for the plotting
-    x, y = tolerance_results['shift']
-    final_points = [(a + x, v + y) for a, v in initial_points]
+    final_points = tolerance_results['shifted_points']
 
     # Prepare a list of dictionaries with the point sets and the colors to plot
     point_sets = [
@@ -34,7 +33,15 @@ def main():
 
 def main2():
     tests = library.tests.TestLibrary("data")
-    plot_manifold.plot_traces(tests, "Traces")
+
+    covariation_results = library.costs.compute_covariation_cost(tests)
+    initial_points = tests.get_release_points()
+    final_points = covariation_results['shifted_points']
+
+    point_sets = [  {"points": initial_points, "color": "b"},
+                    {"points": final_points, "color": "r"}]
+
+    plot_manifold.plot(tests, "Covariation Cost Shift", point_sets)
 
 if __name__ == "__main__":
     main2()
