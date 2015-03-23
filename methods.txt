@@ -1,0 +1,66 @@
+
+Unmodified basin hopping
+This is scipy's implementation of a basinhopping algorithm.  As it is stochastic, it produces slightly different results every time it is run, however it is very, very fast and produces the best results...most of the time.  Here in one trial out of ten it produces a much worse result, the rest of the trials it produced results identical to within five decimal places.
+trial 0, 13.2430000305 seconds, initial = 47.1924289236, final = 40.4679400895, result = 6.72448883401
+trial 1, 12.5720000267 seconds, initial = 47.1924289236, final = 40.4679399847, result = 6.72448893888
+trial 2, 13.0490000248 seconds, initial = 47.1924289236, final = 40.4679396325, result = 6.72448929106
+trial 3, 13.8069999218 seconds, initial = 47.1924289236, final = 40.4679396914, result = 6.72448923212
+trial 4, 13.2290000916 seconds, initial = 47.1924289236, final = 40.4679401258, result = 6.72448879778
+trial 5, 13.0609998703 seconds, initial = 47.1924289236, final = 41.3004446752, result = 5.89198424833
+trial 6, 13.9040000439 seconds, initial = 47.1924289236, final = 40.4679397368, result = 6.72448918676
+trial 7, 13.868999958 seconds, initial = 47.1924289236, final = 40.4679398021, result = 6.72448912146
+trial 8, 13.4300000668 seconds, initial = 47.1924289236, final = 40.467939624, result = 6.72448929952
+trial 9, 12.6150000095 seconds, initial = 47.1924289236, final = 40.4679396804, result = 6.7244892432
+
+Sternad & Cohen 2009 exhastive grid search
+This is the 500x500 grid search as described by Sternad and Cohen in the 2009 paper.  It is a deterministic algorithm, so it produces the same result every time, but it is 20x slower than basinhopping and does not produce an optimal result.
+trial 0, 357.251000166 seconds, initial = 47.1924289236, final = 40.7226124126, result = 6.46981651093
+trial 1, 354.194999933 seconds, initial = 47.1924289236, final = 40.7226124126, result = 6.46981651093
+trial 2, 350.125999928 seconds, initial = 47.1924289236, final = 40.7226124126, result = 6.46981651093
+trial 3, 323.374000072 seconds, initial = 47.1924289236, final = 40.7226124126, result = 6.46981651093
+trial 4, 264.315000057 seconds, initial = 47.1924289236, final = 40.7226124126, result = 6.46981651093
+trial 5, 264.921999931 seconds, initial = 47.1924289236, final = 40.7226124126, result = 6.46981651093
+trial 6, 263.101999998 seconds, initial = 47.1924289236, final = 40.7226124126, result = 6.46981651093
+trial 7, 268.565999985 seconds, initial = 47.1924289236, final = 40.7226124126, result = 6.46981651093
+trial 8, 267.398000002 seconds, initial = 47.1924289236, final = 40.7226124126, result = 6.46981651093
+trial 9, 261.184000015 seconds, initial = 47.1924289236, final = 40.7226124126, result = 6.46981651093
+
+Sternad & Cohen modified partial grid search
+Using knowledge of the solution space, we know with high confidence that the optimal distribution will not be centered on a grid location with a high value.  Here we begin with a very loose grid search for points on the solution manifold with an abs(closest approach) value of less than 30 pixels.  We then recursively fill in grid points between them to produce a very high resolution partial grid of points near the cpa=0 line, and exhaustively search them.  Because the algorithm doesn't waste time searching grid locations far from the optimal line we find that we can search a much higher resolution area in less time.  We see a 10x speed improvement and a better result over the 500x500 grid search, but we do not see the optimal result of basinhopping.
+trial 0, 27.5429999828 seconds, initial = 47.1924289236, final = 40.6851084174, result = 6.50732050614
+trial 1, 26.9210000038 seconds, initial = 47.1924289236, final = 40.6851084174, result = 6.50732050614
+trial 2, 26.8680000305 seconds, initial = 47.1924289236, final = 40.6851084174, result = 6.50732050614
+trial 3, 27.7019999027 seconds, initial = 47.1924289236, final = 40.6851084174, result = 6.50732050614
+trial 4, 29.6349999905 seconds, initial = 47.1924289236, final = 40.6851084174, result = 6.50732050614
+trial 5, 28.0160000324 seconds, initial = 47.1924289236, final = 40.6851084174, result = 6.50732050614
+trial 6, 27.1899998188 seconds, initial = 47.1924289236, final = 40.6851084174, result = 6.50732050614
+trial 7, 29.5789999962 seconds, initial = 47.1924289236, final = 40.6851084174, result = 6.50732050614
+trial 8, 28.2090001106 seconds, initial = 47.1924289236, final = 40.6851084174, result = 6.50732050614
+trial 9, 27.8170001507 seconds, initial = 47.1924289236, final = 40.6851084174, result = 6.50732050614
+
+Nelder-Mead downhill simplex with partial grid restart - sparse
+This is the Nelder-Mead downhill simplex algorithm...the same one employed by the basin hopping search...except that instead of stochastically computing additional starting points (like basin hopping) we start with a series of grid points to serve as our starting points.  A 50x50 grid is drawn over the entire solution manifold, and all points with a cpa >= 30 are saved as starting points.  Then the program runs the Nelder-Mead algorithm at each starting point.  The result is a deterministic optimization that produces a better result than either the exhaustive or partial grid search, but not quite as good basinhopping.  It does it, however, in a very short period of time, equivilent to basin hopping.
+trial 0, 11.9859998226 seconds, initial = 47.1924289236, final = 40.6569255198, result = 6.53550340379
+trial 1, 11.4100000858 seconds, initial = 47.1924289236, final = 40.6569255198, result = 6.53550340379
+trial 2, 11.5010001659 seconds, initial = 47.1924289236, final = 40.6569255198, result = 6.53550340379
+trial 3, 11.8159999847 seconds, initial = 47.1924289236, final = 40.6569255198, result = 6.53550340379
+trial 4, 11.8279998302 seconds, initial = 47.1924289236, final = 40.6569255198, result = 6.53550340379
+trial 5, 12.4700000286 seconds, initial = 47.1924289236, final = 40.6569255198, result = 6.53550340379
+trial 6, 11.8980000019 seconds, initial = 47.1924289236, final = 40.6569255198, result = 6.53550340379
+trial 7, 11.9589998722 seconds, initial = 47.1924289236, final = 40.6569255198, result = 6.53550340379
+trial 8, 11.7170000076 seconds, initial = 47.1924289236, final = 40.6569255198, result = 6.53550340379
+trial 9, 11.9099998474 seconds, initial = 47.1924289236, final = 40.6569255198, result = 6.53550340379
+
+Nelder-Mead downhill simplex with partial grid restart - less sparse
+This is the same as the sparse algorithm mentioned above, but uses a grid that has 4x the points.  It is slower than the other methods (aside from the exhaustive search) but produces the same optimal result as basinhopping within five decimal places.
+trial 0, 43.2760000229 seconds, initial = 47.1924289236, final = 40.467939758, result = 6.72448916558
+trial 1, 41.5360000134 seconds, initial = 47.1924289236, final = 40.467939758, result = 6.72448916558
+trial 2, 44.0140001774 seconds, initial = 47.1924289236, final = 40.467939758, result = 6.72448916558
+trial 3, 41.2999999523 seconds, initial = 47.1924289236, final = 40.467939758, result = 6.72448916558
+trial 4, 41.8680000305 seconds, initial = 47.1924289236, final = 40.467939758, result = 6.72448916558
+trial 5, 43.873000145 seconds, initial = 47.1924289236, final = 40.467939758, result = 6.72448916558
+trial 6, 41.3480000496 seconds, initial = 47.1924289236, final = 40.467939758, result = 6.72448916558
+trial 7, 42.4800000191 seconds, initial = 47.1924289236, final = 40.467939758, result = 6.72448916558
+trial 8, 42.9330000877 seconds, initial = 47.1924289236, final = 40.467939758, result = 6.72448916558
+trial 9, 41.5920000076 seconds, initial = 47.1924289236, final = 40.467939758, result = 6.72448916558
+
