@@ -28,6 +28,9 @@ def main():
 
     # Plot the manifold and the two point sets
     plot_manifold.plot(tests, "Tolerance Cost Shift", point_sets)
+    print(
+        tolerance_results["description"]
+    )
 
     # And other stuff
 
@@ -42,6 +45,36 @@ def main2():
                     {"points": final_points, "color": "r"}]
 
     plot_manifold.plot(tests, "Covariation Cost Shift", point_sets)
+    print(
+        covariation_results["initial_score"]
+    )
+    print(
+        covariation_results["final_score"]
+    )
+    print(
+        covariation_results["cost"]
+    )
+
+def main3():
+    tests = library.tests.TestLibrary("data")
+
+    noise_results = library.costs.compute_noise_cost(tests)
+    initial_points = tests.get_release_points()
+    final_points = noise_results['shifted_points']
+
+    point_sets = [  {"points": initial_points, "color": "b"},
+                    {"points": final_points, "color": "r"}]
+
+    plot_manifold.plot(tests, "Noise Cost Shift", point_sets)
+    print(
+        noise_results["initial_score"]
+    )
+    print(
+        noise_results["final_score"]
+    )
+    print(
+        noise_results["cost"]
+    )
 
 if __name__ == "__main__":
-    main2()
+    main()
