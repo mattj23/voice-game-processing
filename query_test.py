@@ -1,6 +1,8 @@
 
 import library.tests
 import library.costs
+import library.temporal
+
 import plot_manifold
 
 import datetime
@@ -43,5 +45,15 @@ def main2():
 
     plot_manifold.plot(tests, "Covariation Cost Shift", point_sets)
 
+
+def test_temporal():
+    tests = library.tests.TestLibrary("data")
+
+    results = library.temporal.lag_1_autocorrelation(tests, "closest_approach")
+    print results
+
+    results = library.temporal.detrended_fluctuation_analysis(tests, "closest_approach")
+    print results 
+
 if __name__ == "__main__":
-    main2()
+    test_temporal()
