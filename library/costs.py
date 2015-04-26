@@ -7,6 +7,7 @@
 
 import manifold
 import tests
+import vector
 
 import scipy.optimize
 
@@ -66,6 +67,67 @@ def __load_tests(test_group):
         raise Exception("Loading tests failed on: " + ", ".join(failed) )
     return test_data
 
+
+def compute_noise_cost(test_group):
+    """
+    Compute the noise cost for a TestGroup object or a list of filepaths using the algorithm described by Sternad and
+    Cohen 2009. Return a dictionary with the results of the analysis.
+    :param test_group: a TestGroup object or a list of paths of test .json files
+    :return: a results dictionary
+    """
+    test_data = __load_tests(test_group)
+    if not manifold.validate_same_manifold(test_data):
+        raise Exception("The test group provided has tests which do not all lie on the same solution manifold")
+
+
+
+    # Now that we've got the test data loaded and validated, we can create a simulator object based off of the settings
+    # of the first test in the list (we have just validated that they are all the same, so this is acceptable)
+    simulator = manifold.SolutionManifold(test_data[0]['settings'])
+
+    # Find the mean point in the test group
+    release_points = []
+    for data in test_data:
+        release_points.append(vector.Vector(data['release_angle'], data['release_stretch'], 0))
+    n = len(release_points)
+    mean_point = vector.get_average_point(release_points)
+
+    # Get the initial score
+    results = [abs(simulator.get_closest_approach(v.x, v.y)) for v in release_points]
+    initial_score = sum(results) / n
+
+    # Create a list where each point is represented by a vector from the mean point
+    mean_vectors = [point - mean_point for point in release_points]
+
+    # Go through 100 steps and transform each point by that percentage from the mean
+    total_results = []
+    for scale in range(100):
+        # Scale the distribution
+        scale_factor = scale / 100.0
+        scaled_distribution = []
+
+        for v in mean_vectors:
+            direction = v.unit()
+            length = scale_factor * v.length()
+
+            scaled_distribution.append(mean_point + direction * length)
+
+        # Evaluate the scaled distribution
+        results = [abs(simulator.get_closest_approach(v.x, v.y)) for v in scaled_distribution]
+        total_results.append([sum(results)/ n, scale_factor, scaled_distribution])
+
+    simulator.close_process()
+
+    # Find the one with the lowest value
+    final_score, scale_factor, distribution = min(total_results)
+
+    output = {  "cost": initial_score - final_score,
+                "initial_score": initial_score,
+                "final_score": final_score,
+                "scale": scale_factor,
+                "shifted_points": [(v.x, v.y) for v in distribution] }
+
+    return output
 
 def compute_tolerance_cost(test_group):
     """
