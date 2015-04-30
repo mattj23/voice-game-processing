@@ -42,21 +42,19 @@ class TestGroup:
         """
         Return a list of a particular key from all of the test files, along with a second list containing the names
         of the filenames, such that zip() can combine the two into a list of tuples containing the attribute and the
-        file from which it came.
+        file from which it came.  The results will be ordered by ascending timestamp.
         :param key: the key to aggregate
         :return: two lists, the first containing the assembled values, and the second containing the filenames
         """
-        attributes = []
-        filenames = []
+        extracted = []
         for item in self.files:
             data = load_test_file(item)
             if data is not None:
                 if key in data.keys():
-                    attributes.append(data[key])
-                else:
-                    attributes.append(None)
-            filenames.append(item)
-        return attributes, filenames
+                    extracted.append( (data['timestamp'], data[key], item) )
+        extracted.sort()
+        timestamps, values, filenames = zip(*extracted)
+        return values, filenames
 
     def get_unique_list_of_key(self, key):
         """
@@ -86,7 +84,7 @@ class TestGroup:
         Simple filtering: use dictionary based filter to sort the existing elements in the group. The filter_data
         dictionary/dictionaries should be of the form:
 
-            {   key1:value1, key2:value2  }
+            {   key1: value1, key2: value2  }
 
         The value can be a single value, in the case of a simple match, or a function which returns true or false based
          on the filter conditions.
