@@ -9,7 +9,7 @@ def main():
 
     # Load a test group of just Jarrad's tests
     tests = library.tests.TestLibrary("data")
-    tests = tests.filter({"subject": "Jarrad"})
+    tests = tests.filter({"subject": "NF001"})
 
     # Compute the tolerance cost and capture the results
     tolerance_results = library.costs.compute_tolerance_cost(tests)
@@ -41,8 +41,10 @@ def main2():
     initial_points = tests.get_release_points()
     final_points = covariation_results['shifted_points']
 
-    point_sets = [  {"points": initial_points, "color": "b"},
-                    {"points": final_points, "color": "r"}]
+    point_sets = [
+                    {'points': initial_points, 'color': 'b'},
+                    {"points": final_points,   "color": "orange"}
+                ]
 
     plot_manifold.plot(tests, "Covariation Cost Shift", point_sets)
     print(
@@ -59,13 +61,36 @@ def main3():
     tests = library.tests.TestLibrary("data")
 
     noise_results = library.costs.compute_noise_cost(tests)
+
+    noise_results = library.costs.compute_noise_cost(tests)
+    initial_points = tests.get_release_points()
+    final_points = noise_results['shifted_points']
+
+    point_sets = [
+                    {"points": initial_points,   "color": "b"},
+                    {"points": final_points,   "color": "green"}
+                ]
+
+    plot_manifold.plot(tests, "Noise Cost Shift", point_sets)
+    print(
+        noise_results["initial_score"]
+    )
+    print(
+        noise_results["cost"]
+    )
+
+def main4():
+    tests = library.tests.TestLibrary("data")
+
+    noise_results = library.costs.compute_noise_cost(tests)
     covariation_results = library.costs.compute_covariation_cost(tests)
     tolerance_results = library.costs.compute_tolerance_cost(tests)
 
     print "Initial Score: ", noise_results['initial_score']
+    print "Tolerance Cost: ", tolerance_results['cost']
     print "Noise Cost: ", noise_results['cost']
     print "Covariation Cost: ", covariation_results['cost']
-    print "Tolerance Cost: ", tolerance_results['cost']
+
 
 
     initial_points = tests.get_release_points()
@@ -80,4 +105,4 @@ def main3():
 
 
 if __name__ == "__main__":
-    main3()
+    main4()
