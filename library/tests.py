@@ -8,6 +8,16 @@ import json
 import datetime
 import os
 
+# def chunks(l, n):
+#     """ Yield successive n-sized chunks from l.
+#     """
+#     for i in xrange(0, len(l), n):
+#         yield l[i:i+n]
+
+def chunks(l, n):
+    n = max(1, n)
+    return [l[i:i + n] for i in range(0, len(l), n)]
+
 class TestGroup:
     """
     The TestGroup class is a group of test files.  It is similar to the TestLibrary except that it is not bound to
@@ -55,6 +65,16 @@ class TestGroup:
         extracted.sort()
         timestamps, values, filenames = zip(*extracted)
         return values, filenames
+
+    def split_into_parts(self, parts):
+        """
+        Splits a list of tests into equal pieces
+        :return: a list of n TestGroup objects with roughly equal parts
+        """
+        self.files.sort()
+
+        group_size = int(len(self.files) / float(parts)) + 1
+        return [TestGroup(x) for x in chunks(self.files, group_size)]
 
     def get_unique_list_of_key(self, key):
         """
