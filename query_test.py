@@ -1,3 +1,4 @@
+import math
 
 import library.tests
 import library.costs
@@ -7,8 +8,8 @@ import plot_manifold
 
 import datetime
 
-def main():
 
+def main():
     # Load a test group of just Jarrad's tests
     tests = library.tests.TestLibrary("data")
     tests = tests.filter({"subject": "Jarrad"})
@@ -24,9 +25,9 @@ def main():
 
     # Prepare a list of dictionaries with the point sets and the colors to plot
     point_sets = [
-                    {'points': initial_points, 'color': 'b'},
-                    {"points": final_points,   "color": "r"}
-                ]
+        {'points': initial_points, 'color': 'b'},
+        {"points": final_points, "color": "r"}
+    ]
 
     # Plot the manifold and the two point sets
     plot_manifold.plot(tests, "Tolerance Cost Shift", point_sets)
@@ -36,6 +37,7 @@ def main():
 
     # And other stuff
 
+
 def main2():
     tests = library.tests.TestLibrary("data")
 
@@ -43,8 +45,8 @@ def main2():
     initial_points = tests.get_release_points()
     final_points = covariation_results['shifted_points']
 
-    point_sets = [  {"points": initial_points, "color": "b"},
-                    {"points": final_points, "color": "r"}]
+    point_sets = [{"points": initial_points, "color": "b"},
+                  {"points": final_points, "color": "r"}]
 
     plot_manifold.plot(tests, "Covariation Cost Shift", point_sets)
     print(
@@ -56,6 +58,7 @@ def main2():
     print(
         covariation_results["cost"]
     )
+
 
 def main3():
     tests = library.tests.TestLibrary("data")
@@ -69,17 +72,28 @@ def main3():
     print "Covariation Cost: ", covariation_results['cost']
     print "Tolerance Cost: ", tolerance_results['cost']
 
-
     initial_points = tests.get_release_points()
 
-    point_sets = [  {"points": initial_points, "color": "blue"},
-                    {"points": noise_results['shifted_points'], "color": "red"},
-                    {"points": covariation_results['shifted_points'], "color": "orange"},
-                    {"points": tolerance_results['shifted_points'], "color": "green"},
-                    ]
+    point_sets = [{"points": initial_points, "color": "blue"},
+                  {"points": noise_results['shifted_points'], "color": "red"},
+                  {"points": covariation_results['shifted_points'], "color": "orange"},
+                  {"points": tolerance_results['shifted_points'], "color": "green"},
+                  ]
     plot_manifold.plot(tests, "Cost Shifts", point_sets)
 
 
+def test_x0():
+    """
+    Test the computed x0 through x180 values
+    :return:
+    """
+    tests = library.tests.TestLibrary("data")
+    results = library.temporal.lag_1_autocorrelation(tests, "x0")
+    print results
+
+    # The angle key has to be put into a string
+    results = library.temporal.detrended_fluctuation_analysis(tests, "x" + str(0.5 * math.pi))
+    print results
 
 
 def test_temporal():
@@ -89,7 +103,8 @@ def test_temporal():
     print results
 
     results = library.temporal.detrended_fluctuation_analysis(tests, "closest_approach")
-    print results 
+    print results
+
 
 if __name__ == "__main__":
-    test_temporal()
+    test_x0()
