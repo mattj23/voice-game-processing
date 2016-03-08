@@ -13,10 +13,16 @@ import os
 #     """
 #     for i in xrange(0, len(l), n):
 #         yield l[i:i+n]
+import re
+
+import math
+import numpy
+
 
 def chunks(l, n):
     n = max(1, n)
     return [l[i:i + n] for i in range(0, len(l), n)]
+
 
 class TestGroup:
     """
@@ -27,7 +33,7 @@ class TestGroup:
     """
     files = []
 
-    def __init__(self, file_list = []):
+    def __init__(self, file_list=[]):
         """
         :param file_list: optional list of file paths to initialize the test group
         """
@@ -56,14 +62,54 @@ class TestGroup:
         :param key: the key to aggregate
         :return: two lists, the first containing the assembled values, and the second containing the filenames
         """
+        # Check if this is the temporal characteristic
+        match = re.match(r"^x([-+]?[0-9]*\.?[0-9]+)$", key)
+        if match:
+            angle_value = float(match.group(1))
+            return self.__get_2d_temporal_x_characteristic(angle_value)
+
         extracted = []
         for item in self.files:
             data = load_test_file(item)
             if data is not None:
                 if key in data.keys():
-                    extracted.append( (data['timestamp'], data[key], item) )
+                    extracted.append((data['timestamp'], data[key], item))
         extracted.sort()
         timestamps, values, filenames = zip(*extracted)
+        return values, filenames
+
+    def __get_2d_temporal_x_characteristic(self, angle):
+        """
+        Compute and return the values for the get_list_of_key for the temporal x0 to x0.5pi value.
+        :param angle:
+        :return:
+        """
+
+        # Get the release angles and the stretch
+        extracted = []
+        for item in self.files:
+            data = load_test_file(item)
+            extracted.append((data['timestamp'], data['release_angle'], data['release_stretch'], item))
+        extracted.sort()
+
+        # Unpack them and compute the means and standard deviations
+        timestamps, release_angle, release_stretch, filenames = zip(*extracted)
+
+        p_mean = numpy.mean(release_angle)
+        v_mean = numpy.mean(release_stretch)
+        p_std = numpy.std(release_angle)
+        v_std = numpy.std(release_stretch)
+
+        normalized_p = [(p-p_mean)/p_std for p in release_angle]
+        normalized_v = [(v-v_mean)/v_std for v in release_stretch]
+
+        values = []
+        for x1, x2 in zip(normalized_p, normalized_v):
+            values.append(x1 * math.cos(angle) + x2 * math.sin(angle))
+
+        if len(filenames) != len(values):
+            raise ValueError("The number of computed values didn't come out to be the same as the number of files in the TestGroup, check the algorithm")
+
         return values, filenames
 
     def split_into_parts(self, parts):
@@ -201,7 +247,7 @@ class TestGroup:
         datetime.timedelta object
         """
         first = None
-        last  = None
+        last = None
 
         for item in self.files:
             data = load_test_file(item)
@@ -213,7 +259,6 @@ class TestGroup:
                 last = data['timestamp']
 
         return {"first": first, "last": last, "span": last - first}
-
 
     def summarize(self):
         """
@@ -230,7 +275,7 @@ class TestGroup:
         misses = 0
         obstacle = 0
         first = None
-        last  = None
+        last = None
 
         for item in self.files:
             data = load_test_file(item)
@@ -249,12 +294,12 @@ class TestGroup:
             if last is None or data['timestamp'] > last:
                 last = data['timestamp']
 
-        output = {  "subjects": list(set(subjects)),
-                    "count": count,
-                    "hits": hits,
-                    "misses": misses,
-                    "obstacles": obstacle,
-                    "timespan": td_format(last - first)}
+        output = {"subjects": list(set(subjects)),
+                  "count": count,
+                  "hits": hits,
+                  "misses": misses,
+                  "obstacles": obstacle,
+                  "timespan": td_format(last - first)}
         return output
 
     def print_summary(self):
@@ -300,7 +345,8 @@ class TestLibrary(TestGroup):
         Go through the library_path and find all test files and verify them
         :return:
         """
-        file_objects = [os.path.join(self.library_path, item) for item in os.listdir(self.library_path) if item.endswith(".json")]
+        file_objects = [os.path.join(self.library_path, item) for item in os.listdir(self.library_path) if
+                        item.endswith(".json")]
 
         # Validate the files
         validated = []
@@ -309,9 +355,6 @@ class TestLibrary(TestGroup):
                 validated.append(item)
 
         self.files = validated
-
-
-
 
 
 def load_test_file(filepath):
@@ -339,24 +382,25 @@ def load_test_file(filepath):
     results['timestamp'] = timestamp
     return results
 
+
 def td_format(td_object):
-        seconds = int(td_object.total_seconds())
-        periods = [
-                ('year',        60*60*24*365),
-                ('month',       60*60*24*30),
-                ('day',         60*60*24),
-                ('hour',        60*60),
-                ('minute',      60),
-                ('second',      1)
-                ]
+    seconds = int(td_object.total_seconds())
+    periods = [
+        ('year', 60 * 60 * 24 * 365),
+        ('month', 60 * 60 * 24 * 30),
+        ('day', 60 * 60 * 24),
+        ('hour', 60 * 60),
+        ('minute', 60),
+        ('second', 1)
+    ]
 
-        strings=[]
-        for period_name,period_seconds in periods:
-                if seconds > period_seconds:
-                        period_value , seconds = divmod(seconds,period_seconds)
-                        if period_value == 1:
-                                strings.append("%s %s" % (period_value, period_name))
-                        else:
-                                strings.append("%s %ss" % (period_value, period_name))
+    strings = []
+    for period_name, period_seconds in periods:
+        if seconds > period_seconds:
+            period_value, seconds = divmod(seconds, period_seconds)
+            if period_value == 1:
+                strings.append("%s %s" % (period_value, period_name))
+            else:
+                strings.append("%s %ss" % (period_value, period_name))
 
-        return ", ".join(strings)
+    return ", ".join(strings)

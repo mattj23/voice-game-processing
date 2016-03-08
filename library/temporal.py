@@ -10,6 +10,7 @@ import scipy.stats
 import subprocess
 import os
 
+
 def __auto_correlation(x, lag=1):
     """
     Perform an autocorrelation with a specified lag and return the correlation coefficient
@@ -17,7 +18,8 @@ def __auto_correlation(x, lag=1):
     :param lag: the lag for the auto correlation, defaults to 1
     :return: the correlation coefficient
     """
-    return numpy.corrcoef(numpy.array([x[0:len(x)-lag], x[lag:len(x)]]))
+    return numpy.corrcoef(numpy.array([x[0:len(x) - lag], x[lag:len(x)]]))
+
 
 def lag_1_autocorrelation(test_group, property):
     """
@@ -33,7 +35,8 @@ def lag_1_autocorrelation(test_group, property):
 
     # Validate that this is a TestGroup object
     if not isinstance(test_group, tests.TestGroup):
-        raise ValueError("The test_group argument passed to the lag_1_autocorrelation function must be a tests.TestGroup object")
+        raise ValueError(
+            "The test_group argument passed to the lag_1_autocorrelation function must be a tests.TestGroup object")
 
     # Extract the closest approach value
     property_values, filenames = test_group.get_list_of_key(property)
@@ -94,5 +97,3 @@ def detrended_fluctuation_analysis(test_group, property):
                                          "stderr": standard_error}}
 
     return output_data
-
-
