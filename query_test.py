@@ -1,6 +1,7 @@
 
 import library.tests
 import library.costs
+import library.temporal
 import plot_manifold
 
 import datetime
@@ -184,5 +185,21 @@ def main6():
         print "Noise Cost: ", noise_results['cost']
         print "Covariation Cost: ", covariation_results['cost']
 
+
+def test_x0():
+    """
+    Test the computed x0 through x180 values
+    :return:
+    """
+    tests = library.tests.TestLibrary("data")
+    results = library.temporal.lag_1_autocorrelation(tests, "x0")
+    print results
+
+    # The angle key has to be put into a string
+    results = library.temporal.detrended_fluctuation_analysis(tests, "x" + str(0.5 * math.pi))
+    print results
+
+
+
 if __name__ == "__main__":
-    main4()
+    test_x0()
