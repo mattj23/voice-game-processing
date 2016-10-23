@@ -60,9 +60,7 @@ def plot(test_group, plot_title, points=[]):
 
     fig, ax = plt.subplots(figsize=(8, 8))
     cax = ax.imshow(z, aspect='auto', origin='lower', cmap=c_map, vmin=0, vmax=cpa_max, extent=(x.min(), x.max(), y.min(), y.max()))
-    cbar = plt.colorbar(cax)
-    #cbar.set_ticks([0, cpa_max/2, cpa_max])
-    cbar.set_ticklabels([0, cpa_max/2, cpa_max])
+    plt.colorbar(cax)
 
     # Create the release data point series
     if not points:
@@ -94,6 +92,7 @@ def plot_traces(test_group, plot_title):
     """
     test_data = __validate_and_get_dictionaries(test_group)
     manifold = library.manifold.get_solution_manifold(test_data[0])
+    cpa_max = max([abs(p['cpa']) for k, p in manifold.items()])
 
     angles, stretches, output = library.manifold.get_manifold_draw_matrix(manifold)
     x = numpy.array(angles)
@@ -101,7 +100,8 @@ def plot_traces(test_group, plot_title):
     z = numpy.array(output)
 
     fig, ax = plt.subplots(figsize=(8, 8))
-    ax.imshow(z, aspect='auto', origin='lower', extent=(x.min(), x.max(), y.min(), y.max()))
+    cax = ax.imshow(z, aspect='auto', origin='lower', cmap=c_map, vmin=0, vmax=cpa_max, extent=(x.min(), x.max(), y.min(), y.max()))
+    plt.colorbar(cax)
 
     for data in test_data:
         # Get an x, y trace of angle and stretch during the voicing
