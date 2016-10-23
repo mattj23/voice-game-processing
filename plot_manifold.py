@@ -92,7 +92,7 @@ def plot_traces(test_group, plot_title):
     z = numpy.array(output)
 
     fig, ax = plt.subplots(figsize=(8, 8))
-    ax.imshow(z, aspect='auto', origin='lower', cmap=plt.cm.hot, extent=(x.min(), x.max(), y.min(), y.max()))
+    ax.imshow(z, aspect='auto', origin='lower', extent=(x.min(), x.max(), y.min(), y.max()))
 
     for data in test_data:
         # Get an x, y trace of angle and stretch during the voicing
@@ -106,20 +106,20 @@ def plot_traces(test_group, plot_title):
             a.append(library.manifold.get_angle(pitch, data))
             s.append(library.manifold.get_stretch(volume, data))
         a = numpy.array(a)
-        t = numpy.array(t)
+        # t = numpy.array(t)
         s = numpy.array(s)
 
-        colorMap = plt.cm.autumn
+        colorMap = None # plt.cm.autumn
 
         points = numpy.array([a, s]).T.reshape(-1, 1, 2)
         segments = numpy.concatenate([points[:-1], points[1:]], axis=1)
-        lc = LineCollection(segments, cmap=colorMap)
-        lc.set_array(t)
+        lc = LineCollection(segments, colors='r')
+        #lc.set_array(t)
         lc.set_linewidth(3)
 
         #ax.plot(a, s)
         plt.gca().add_collection(lc)
-        ax.scatter(a, s, c=t, cmap=colorMap, s=40)
+        ax.scatter(a, s, s=40, color='r')
 
     # Finalize the plot
     ax.axis([x.min(), x.max(), y.min(), y.max()])
