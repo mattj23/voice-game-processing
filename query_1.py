@@ -95,7 +95,8 @@ def main():
     
     # Program starts here, gather the names of all the available test files from
     # the "Data" folder
-    testFiles = os.listdir("Data")
+    data_folder = r"C:\Users\Jarrad\Desktop\Master Research Folder\Projects\Voice Throwing Game\Data\NF003\Day 1\Filtered"
+    testFiles = os.listdir(data_folder)
 
     # Load all of the tests into one big list. I've written this in a very
     # deliberate, explict way.  We loop through the list of test file names,
@@ -104,7 +105,7 @@ def main():
     # of raw test data.
     tests = []
     for filename in testFiles:
-        path = os.path.join("Data", filename)
+        path = os.path.join(data_folder, filename)
         testData = load_test_file(path)
         tests.append(testData)
 
