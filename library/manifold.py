@@ -13,7 +13,11 @@ import json
 import subprocess
 import hashlib
 import math
-import tests
+
+try:
+    import tests
+except:
+    import library.tests as tests
 
 MODULE_PATH = os.path.dirname(__file__)
 BINARY_FOLDER = os.path.join(MODULE_PATH, "manifold_binaries")

@@ -544,7 +544,7 @@ def main():
     p = Vector(0.5, 0, 0)
 
 
-    print a.__dict__
+    print(a.__dict__)
 
 if __name__ == '__main__':
     main()
