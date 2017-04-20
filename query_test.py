@@ -8,6 +8,8 @@ import plot_manifold
 
 import datetime
 
+import library.continuous
+
 
 def main():
     # Load a test group of just Jarrad's tests
@@ -61,7 +63,9 @@ def main2():
 
 
 def main3():
-    tests = library.tests.TestLibrary("data")
+    # type: () -> object
+    #tests = library.tests.TestLibrary("data")
+    tests = library.continuous.ContinuousGroup("data/Test 2017-04-13_10-04-22.json")
 
     noise_results = library.costs.compute_noise_cost(tests)
     covariation_results = library.costs.compute_covariation_cost(tests)
@@ -107,4 +111,4 @@ def test_temporal():
 
 
 if __name__ == "__main__":
-    test_x0()
+    main3()
