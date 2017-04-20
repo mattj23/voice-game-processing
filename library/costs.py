@@ -14,7 +14,7 @@ except:
     import library.manifold as manifold
     import library.tests as tests
     import library.vector as vector
-    import library.continous as continuous
+    import library.continuous as continuous
 
 import scipy.optimize
 
