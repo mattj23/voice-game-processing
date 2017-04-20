@@ -5,9 +5,16 @@
     of tests.
 """
 
-import manifold
-import tests
-import vector
+try:
+    import manifold
+    import tests
+    import vector
+    import continuous
+except:
+    import library.manifold as manifold
+    import library.tests as tests
+    import library.vector as vector
+    import library.continous as continuous
 
 import scipy.optimize
 
@@ -48,6 +55,9 @@ def __load_tests(test_group):
     :param test_group: Either a TestGroup object or a list of filenames
     :return:
     """
+    if hasattr(test_group, "prepare_for_costs"):
+        return test_group.prepare_for_costs()
+
     if isinstance(test_group, tests.TestGroup) or isinstance(test_group, tests.TestLibrary):
         test_group = test_group.files
 

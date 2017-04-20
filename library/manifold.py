@@ -13,7 +13,11 @@ import json
 import subprocess
 import hashlib
 import math
-import tests
+
+try:
+    import tests
+except:
+    import library.tests as tests
 
 MODULE_PATH = os.path.dirname(__file__)
 BINARY_FOLDER = os.path.join(MODULE_PATH, "manifold_binaries")
@@ -49,14 +53,14 @@ class SolutionManifold:
     def get_closest_approach(self, angle, stretch):
         """ Feed the angle and stretch to the embedded simulation process and
         return the results. """
-        self.process.stdin.write("{},{}\n".format(angle, stretch))
+        self.process.stdin.write("{},{}\n".format(angle, stretch).encode())
         self.process.stdin.flush()
         self.process.stdout.flush()
         result = self.process.stdout.readline()
         return float(result)
 
     def close_process(self):
-        self.process.stdin.write("end\n")
+        self.process.stdin.write("end\n".encode())
 
 
 def get_angle(pitch, data):
@@ -154,9 +158,9 @@ def generate_manifold_token(data):
         if type(element) == dict:
             subkeys = sorted(element.keys())
             for subkey in subkeys:
-                engine.update("{}".format(element[subkey]))
+                engine.update("{}".format(element[subkey]).encode())
         else:
-            engine.update("{}".format(element))
+            engine.update("{}".format(element).encode())
 
     # Return the hexdigest as the manifold token
     return engine.hexdigest()
