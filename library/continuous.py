@@ -4,7 +4,7 @@ import math
 
 import library.costs
 
-class ContinousGroup:
+class ContinuousGroup:
     """
     Should emulate the important parts of the TestGroup
     """
@@ -52,7 +52,7 @@ class ContinousGroup:
 
 
 def main():
-    x = ContinousGroup("data/20170403_PM/Test 2017-04-03_15-36-39.json")
+    x = ContinuousGroup("data/20170403_PM/Test 2017-04-03_15-36-39.json")
     results = library.costs.compute_tolerance_cost(x)
     print(results)
 
