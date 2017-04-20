@@ -14,14 +14,22 @@ class ContinuousGroup:
         with open(file_name, "r") as handle:
             self.data = json.loads(handle.read())
 
-    def prepare_for_costs(self):
-        list_of_tests = []
+        self.list_of_tests = []
         for tick, frequency, decibels, closest_approach in self.data['trace']:
             new_item = dict(self.data)
             new_item['release_angle'] = self.get_angle(frequency)
             new_item['release_stretch'] = self.get_stretch(decibels)
-            list_of_tests.append(new_item)
-        return list_of_tests
+            self.list_of_tests.append(new_item)
+
+    def prepare_for_costs(self):
+        return self.list_of_tests
+
+    def get_release_points(self):
+        """
+        Return a list of release angles and stretches
+        :return: a list of 2-element tuples containing the release angle and stretches
+        """
+        return [(r['release_angle'], r['release_stretch']) for r in self.list_of_tests]
 
     def get_angle(self, frequency):
         fraction = 0.0
