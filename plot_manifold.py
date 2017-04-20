@@ -26,12 +26,12 @@ def __validate_and_get_dictionaries(test_group):
     :return: a list of test data dictionaries
     """
     # Validate that the test_group is a TestGroup object
-    if not (isinstance(test_group, library.tests.TestGroup) or isinstance(test_group, library.tests.TestLibrary)):
+    if not hasattr(test_group, "get_data_list"):
         raise Exception("test_group must be a TestGroup or TestLibrary object")
 
     # Validate that the test group all has the same manifold
-    if not library.manifold.validate_same_manifold(test_group):
-        raise Exception("specified test group does not all lie on the same manifold")
+    #if not library.manifold.validate_same_manifold(test_group):
+    #    raise Exception("specified test group does not all lie on the same manifold")
 
     # Create the plot of the solution manifold
     return test_group.get_data_list()

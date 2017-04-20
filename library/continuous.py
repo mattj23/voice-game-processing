@@ -24,6 +24,9 @@ class ContinuousGroup:
     def prepare_for_costs(self):
         return self.list_of_tests
 
+    def get_data_list(self):
+        return self.list_of_tests
+
     def get_release_points(self):
         """
         Return a list of release angles and stretches
