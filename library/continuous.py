@@ -48,7 +48,7 @@ class ContinuousGroup:
         if fraction > 1:
             fraction = 1.0
 
-        return fraction * (settings['AngleMaximum'] - settings["AngleMinimum"]) + (settings['AngleMaximum'] - settings["AngleMinimum"]) / 2.0
+        return fraction * (settings['AngleMaximum'] - settings["AngleMinimum"]) + (settings['AngleMaximum'] + settings["AngleMinimum"]) / 2.0
 
 
     def get_stretch(self, volume):
