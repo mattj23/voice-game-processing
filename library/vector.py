@@ -143,7 +143,7 @@ def get_average_point(points):
     a = Vector()
     for v in points:
         a += v
-    return a / n
+    return a * (1 / n)
 
 def max_distance_between_points(points):
     return max([max([[p.distance_to(p2), p, p2] for p2 in points]) for p in points])[0]
